@@ -1,0 +1,124 @@
+{% extends "qr/base.html" %}
+{% block title %}Générer un QR • Signum Qr Generator{% endblock %}
+{% block meta_description %}Générez un QR code (texte, URL, image) et personnalisez ses couleurs, correction d’erreur, taille et bordure. Résultat partageable.{% endblock %}
+
+{% block content %}
+  <div class="grid gap-6 lg:grid-cols-2">
+    <div class="rounded-2xl border border-slate-200 bg-white/70 backdrop-blur shadow-sm dark:border-slate-800 dark:bg-slate-900/50 p-6">
+      <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Type de contenu</label>
+          {{ form.content_type }}
+          {% if form.content_type.errors %}
+            <p class="mt-2 text-sm text-red-500">{{ form.content_type.errors|striptags }}</p>
+          {% endif %}
+        </div>
+
+        <div id="textBlock">
+          <label class="block text-sm font-medium mb-1">Texte / URL</label>
+          {{ form.text }}
+          {% if form.text.errors %}
+            <p class="mt-2 text-sm text-red-500">{{ form.text.errors|striptags }}</p>
+          {% endif %}
+          <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ex: https://example.com</p>
+        </div>
+
+        <div id="imageBlock" class="hidden">
+          <label class="block text-sm font-medium mb-1">Image (upload)</label>
+          {{ form.image }}
+          {% if form.image.errors %}
+            <p class="mt-2 text-sm text-red-500">{{ form.image.errors|striptags }}</p>
+          {% endif %}
+          <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Le QR contiendra l’URL publique de l’image.</p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-semibold">Personnalisation</h3>
+            <span class="text-xs text-slate-500 dark:text-slate-400">Bleu / Violet</span>
+          </div>
+
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="block text-sm font-medium mb-1">Couleur du QR</label>
+              {{ form.fill_color }}
+              {% if form.fill_color.errors %}
+                <p class="mt-2 text-sm text-red-500">{{ form.fill_color.errors|striptags }}</p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-1">Couleur du fond</label>
+              {{ form.back_color }}
+              {% if form.back_color.errors %}
+                <p class="mt-2 text-sm text-red-500">{{ form.back_color.errors|striptags }}</p>
+              {% endif %}
+            </div>
+
+            <label class="flex items-center gap-2 text-sm sm:col-span-2">
+              {{ form.transparent_background }}
+              <span>Fond transparent</span>
+            </label>
+
+            <div>
+              <label class="block text-sm font-medium mb-1">Correction d’erreur</label>
+              {{ form.error_correction }}
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium mb-1">Taille</label>
+                {{ form.box_size }}
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Bordure</label>
+                {{ form.border }}
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
+            Conseil: garde un bon contraste (QR foncé sur fond clair) pour une lecture fiable.
+          </p>
+        </div>
+
+        <button class="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-95 transition">
+          Générer le QR Code
+        </button>
+      </form>
+
+      <script>
+        const select = document.getElementById("id_content_type");
+        const textBlock = document.getElementById("textBlock");
+        const imageBlock = document.getElementById("imageBlock");
+
+        function toggleBlocks() {
+          const v = select.value;
+          if (v === "text") {
+            textBlock.classList.remove("hidden");
+            imageBlock.classList.add("hidden");
+          } else {
+            imageBlock.classList.remove("hidden");
+            textBlock.classList.add("hidden");
+          }
+        }
+
+        toggleBlocks();
+        select.addEventListener("change", toggleBlocks);
+      </script>
+    </div>
+
+    <!-- <div class="rounded-2xl border border-slate-200 bg-white/70 backdrop-blur shadow-sm dark:border-slate-800 dark:bg-slate-900/50 p-6">
+      <h2 class="text-lg font-semibold">Résultat</h2>
+      <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+        Après génération, tu seras redirigé vers une page dédiée partageable.
+      </p>
+
+      <div class="mt-6 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-sm text-slate-500 dark:text-slate-400">
+        Tu peux personnaliser les couleurs (bleu/violet), la taille, la bordure et la correction d’erreur.
+      </div>
+    </div> -->
+  </div>
+{% endblock %}

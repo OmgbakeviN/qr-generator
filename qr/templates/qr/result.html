@@ -1,0 +1,98 @@
+{% extends "qr/base.html" %}
+{% block title %}QR généré • Signum Qr Generator{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}QR généré • Signum Qr Generator{% endblock %}
+{% block og_description %}QR code personnalisé, prêt à télécharger et partager.{% endblock %}
+{% block og_image %}
+<meta property="og:image" content="{{ obj.qr_image.url }}">
+{% endblock %}
+
+{% block content %}
+  <div class="rounded-2xl border border-slate-200 bg-white/70 backdrop-blur shadow-sm dark:border-slate-800 dark:bg-slate-900/50 p-6 space-y-6">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-semibold">QR Code généré</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 break-words">ID: {{ obj.id }}</p>
+      </div>
+      <a href="{% url 'qr:home' %}" class="text-sm px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900">← Nouveau</a>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <div>
+        <div class="rounded-2xl bg-white p-4 inline-block shadow-sm">
+          <img src="{{ obj.qr_image.url }}" alt="QR Code" class="w-64 h-64 object-contain">
+        </div>
+
+        <div class="mt-4 flex gap-3">
+          <a href="{{ obj.qr_image.url }}" download class="flex-1 text-center py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:opacity-95 transition">
+            Télécharger
+          </a>
+          <a href="{{ obj.qr_image.url }}" target="_blank" class="flex-1 text-center py-3 rounded-xl font-semibold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            Ouvrir
+          </a>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="text-sm break-words">
+          <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Donnée encodée</div>
+          <div class="font-mono">{{ obj.payload }}</div>
+        </div>
+
+        {% if obj.uploaded_image %}
+          <div class="text-sm">
+            <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Image uploadée</div>
+            <a class="underline" href="{{ obj.uploaded_image.url }}" target="_blank">{{ obj.uploaded_image.url }}</a>
+          </div>
+        {% endif %}
+
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+            <div class="text-xs text-slate-500 dark:text-slate-400">Couleur QR</div>
+            <div class="mt-2 flex items-center gap-2">
+              <span class="h-5 w-5 rounded-lg border border-slate-300 dark:border-slate-700" style="background: {{ obj.fill_color }}"></span>
+              <span class="font-mono">{{ obj.fill_color }}</span>
+            </div>
+          </div>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+            <div class="text-xs text-slate-500 dark:text-slate-400">Fond</div>
+            <div class="mt-2 flex items-center gap-2">
+              <span class="h-5 w-5 rounded-lg border border-slate-300 dark:border-slate-700" style="background: {{ obj.back_color }}"></span>
+              <span class="font-mono">{{ obj.back_color }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-sm break-words">
+          <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Lien de partage</div>
+          <div class="flex gap-2">
+            <input id="shareUrl" value="{{ share_url }}" readonly class="flex-1 rounded-xl px-3 py-2 border bg-white text-slate-900 border-slate-200 dark:bg-slate-950 dark:text-slate-100 dark:border-slate-700">
+            <button id="copyBtn" class="px-4 py-2 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-violet-600 hover:opacity-95 transition">
+              Copier
+            </button>
+          </div>
+          <p id="copied" class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 hidden">Copié ✅</p>
+        </div>
+
+        <div class="text-xs text-slate-500 dark:text-slate-500">
+          Créé le {{ obj.created_at }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById("copyBtn");
+    const input = document.getElementById("shareUrl");
+    const copied = document.getElementById("copied");
+
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(input.value);
+        copied.classList.remove("hidden");
+        setTimeout(() => copied.classList.add("hidden"), 1200);
+      } catch (e) {}
+    });
+  </script>
+{% endblock %}
